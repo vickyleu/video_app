@@ -1,0 +1,67 @@
+name: video_app
+description: A new Flutter application.
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.1.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_screenutil: ^0.5.3
+  permission_handler: ^3.3.0
+  cached_network_image: ^2.0.0-rc
+  auto_orientation:
+    git:
+      url: https://github.com/vickyleu/auto_orientation
+
+  flare_flutter: ^1.7.1
+#  chewie: ^0.9.6
+#    video_player: any
+  chewie:
+      git:
+        url: https://github.com/vickyleu/chewie.git
+
+  video_player:
+      git:
+        url: https://github.com/flutter/plugins.git
+        path: packages/video_player
+
+
+  flutter_easyrefresh: any
+  cupertino_icons: ^0.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/flare/
+    - assets/images/
+  fonts:
+    - family: STYuanti
+      fonts:
+        - asset: assets/fonts/STYuanti-Regular.ttf
+          style: italic
+    - family: braggadocio
+      fonts:
+        - asset: assets/fonts/braggadocio.ttf
+    - family: pianpianti
+      fonts:
+        - asset: assets/fonts/pianpianti.ttf
+    - family: PingFang
+      fonts:
+        - asset: assets/fonts/PingFang_Regular.ttf
+        - asset: assets/fonts/PingFang_Bold.ttf
+        - asset: assets/fonts/PingFang_Medium.ttf
+        - asset: assets/fonts/PingFang_Regular.ttf
+    - family: Number
+      fonts:
+        - asset: assets/fonts/DIN_Alternate_Bold.ttf
