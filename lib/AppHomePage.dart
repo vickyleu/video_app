@@ -220,14 +220,14 @@ class HomeState extends State<AppHomePage> {
     ));
   }
 
-  MaterialHeader header;
+  SpaceHeader header;
   MaterialFooter footer;
 
   Widget buildRefreshController(
       BuildContext context, Widget Function() childFunc) {
     final courseCellHeight = dp_width(128);
     if (header == null) {
-      header = MaterialHeader();
+      header = SpaceHeader();
     }
     if (footer == null) {
       footer = MaterialFooter(enableInfiniteLoad: false);
