@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:auto_orientation/auto_orientation.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,15 +40,15 @@ class AppHomePage extends StatefulWidget {
           looping: false,
           autoInitialize: true,
           startAt: Duration(milliseconds: currentSeek.toInt()),
-          deviceOrientationsAfterFullScreen: () sync* {
-            yield DeviceOrientation.portraitDown;
-            if (Platform.isAndroid) {
-              yield DeviceOrientation.landscapeLeft;
-            } else {
-              yield DeviceOrientation.landscapeRight;
-            }
-          }()
-              .toList(),
+//          deviceOrientationsAfterFullScreen: () sync* {
+//            yield DeviceOrientation.portraitDown;
+//            if (Platform.isAndroid) {
+//              yield DeviceOrientation.landscapeLeft;
+//            } else {
+//              yield DeviceOrientation.landscapeRight;
+//            }
+//          }()
+//              .toList(),
           customControls: MyCupertinoControls(
             backgroundColor: Colors.transparent,
             iconColor: Colors.white,
@@ -149,9 +148,6 @@ class HomeState extends State<AppHomePage> {
     });
     refreshData();
     super.initState();
-
-//    player.setDataSource("https://media.w3.org/2010/05/sintel/trailer.mp4",
-//        autoPlay: true);
   }
 
   void refreshData() {}
@@ -342,19 +338,12 @@ class HomeState extends State<AppHomePage> {
                                                   child: Container(
                                                     width: dp_width(40),
                                                     height: dp_width(40),
-                                                    child: CachedNetworkImage(
-                                                      imageUrl: "",
+                                                    child: Image(
+                                                      image: AssetImage(
+                                                          'assets/images/img_avatar_default.png'),
                                                       width: double.infinity,
                                                       height: double.infinity,
                                                       fit: BoxFit.contain,
-                                                      placeholder: (c, s) =>
-                                                          Image(
-                                                        image: AssetImage(
-                                                            'assets/images/img_avatar_default.png'),
-                                                        width: double.infinity,
-                                                        height: double.infinity,
-                                                        fit: BoxFit.contain,
-                                                      ),
                                                     ),
                                                     decoration: BoxDecoration(
                                                         color: Colors.white,
@@ -738,15 +727,8 @@ class HomeState extends State<AppHomePage> {
                           child: Stack(
                             alignment: Alignment.bottomCenter,
                             children: <Widget>[
-                              CachedNetworkImage(
-                                imageUrl: "",
-                                placeholder: (c, s) => Image(
-                                  image:
-                                      AssetImage('assets/images/speak_bg.png'),
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  fit: BoxFit.contain,
-                                ),
+                              Image(
+                                image: AssetImage('assets/images/speak_bg.png'),
                                 width: double.infinity,
                                 height: double.infinity,
                                 fit: BoxFit.contain,
@@ -1148,7 +1130,7 @@ class HomeState extends State<AppHomePage> {
         });
       },
       child:
-//            VideoPlayer(widget.controller)
+//        VideoPlayer(widget.controller)
           Chewie(
         controller: widget.chewieController,
       ),
