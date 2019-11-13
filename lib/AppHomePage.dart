@@ -9,6 +9,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_easyrefresh/material_footer.dart';
+import 'package:flutter_easyrefresh/material_header.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
@@ -18,12 +19,6 @@ import 'SpaceHeader.dart';
 import 'flutter_export.dart';
 
 class AppHomePage extends StatefulWidget {
-  Widget childWidget;
-  VideoPlayerController controller =
-      VideoPlayerController.network("http://www.bond520.com/js/bond.mp4")
-        ..setVolume(1.0);
-
-  ChewieController chewieController;
   bool isFirst = true;
   double currentSeek = 0;
   TextEditingController _nameController = TextEditingController();
@@ -32,49 +27,7 @@ class AppHomePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     requestPermission();
-    if (chewieController == null) {
-      chewieController = ChewieController(
-          videoPlayerController: controller,
-//        aspectRatio: 3 / 2,
-          autoPlay: false,
-          looping: false,
-          autoInitialize: true,
-          startAt: Duration(milliseconds: currentSeek.toInt()),
-//          deviceOrientationsAfterFullScreen: () sync* {
-//            yield DeviceOrientation.portraitDown;
-//            if (Platform.isAndroid) {
-//              yield DeviceOrientation.landscapeLeft;
-//            } else {
-//              yield DeviceOrientation.landscapeRight;
-//            }
-//          }()
-//              .toList(),
-          customControls: MyCupertinoControls(
-            backgroundColor: Colors.transparent,
-            iconColor: Colors.white,
-            fullScreenFunction: () {
-              chewieController?.enterFullScreen();
-            },
-          ),
-          routePageBuilder: (BuildContext context, Animation<double> animation,
-              Animation<double> secondAnimation, provider) {
-            return AnimatedBuilder(
-              animation: animation,
-              builder: (BuildContext context, Widget child) {
-                return VideoScaffold(
-                  child: Scaffold(
-                    resizeToAvoidBottomPadding: false,
-                    body: Container(
-                      alignment: Alignment.center,
-                      color: Colors.black,
-                      child: provider,
-                    ),
-                  ),
-                );
-              },
-            );
-          });
-    }
+
     return HomeState();
   }
 
@@ -101,42 +54,43 @@ class HomeState extends State<AppHomePage> {
   VoidCallback _listen;
 
   bool scrollingInterrupt = false;
+  VideoPlayerController controller =
+      VideoPlayerController.network("http://www.bond520.com/js/bond.mp4")
+        ..setVolume(1.0);
 
+  ChewieController chewieController;
   @override
   void initState() {
-    if (!widget.controller.hasListeners) {
-      widget.controller.addListener(() {
-        try {
-          widget.controller.position.then((f) {
-            widget.currentSeek = f.inMilliseconds.toDouble();
-          });
-        } catch (e) {}
-      });
-    }
+    controller.addListener(() {
+      try {
+        controller.position.then((f) {
+          widget.currentSeek = f.inMilliseconds.toDouble();
+        });
+      } catch (e) {}
+    });
+
     _scrollController.addListener(() {
       if (_listen == null && _scrollController.position != null) {
         _listen = () {
+          ////
           final idle = !_scrollController.position.isScrollingNotifier.value;
           if (scrollingInterrupt) {
             if (idle) {
-              if (!(widget.controller?.value?.isPlaying ?? false)) {
-                setState(() {
-                  widget.chewieController?.play();
-                });
+              if (!_isPlaying()) {
+                play();
                 scrollingInterrupt = false;
               }
             }
           } else {
             if (idle) {
             } else {
-              if (widget.controller?.value?.isPlaying ?? false) {
-                setState(() {
-                  widget.chewieController?.pause();
-                });
+              if (_isPlaying()) {
+                pause();
                 scrollingInterrupt = true;
               }
             }
           }
+          ////
         };
         _scrollController.position.isScrollingNotifier.addListener(_listen);
       }
@@ -146,6 +100,38 @@ class HomeState extends State<AppHomePage> {
         _scrollOffset = of;
       });
     });
+    if (chewieController == null)
+      chewieController = ChewieController(
+          videoPlayerController: controller,
+          autoPlay: false,
+          looping: false,
+          autoInitialize: true,
+          startAt: Duration(milliseconds: widget.currentSeek.toInt()),
+          customControls: MyCupertinoControls(
+            backgroundColor: Colors.transparent,
+            iconColor: Colors.white,
+            fullScreenFunction: () {
+              chewieController?.enterFullScreen();
+            },
+          ),
+          routePageBuilder: (BuildContext context, Animation<double> animation,
+              Animation<double> secondAnimation, provider) {
+            return AnimatedBuilder(
+              animation: animation,
+              builder: (BuildContext context, Widget child) {
+                return VideoScaffold(
+                  child: Scaffold(
+                    resizeToAvoidBottomPadding: false,
+                    body: Container(
+                      alignment: Alignment.center,
+                      color: Colors.black,
+                      child: provider,
+                    ),
+                  ),
+                );
+              },
+            );
+          });
     refreshData();
     super.initState();
   }
@@ -154,12 +140,15 @@ class HomeState extends State<AppHomePage> {
 
   @override
   void dispose() {
-    widget.chewieController?.pause();
-    widget.controller?.pause();
+    chewieController.dispose();
+    controller.dispose();
     try {
-      _scrollController?.position?.isScrollingNotifier?.dispose();
+      _scrollController.position.isScrollingNotifier?.removeListener(_listen);
+      _scrollController.position?.isScrollingNotifier?.dispose();
     } catch (e) {}
     _scrollController?.dispose();
+    _listen = null;
+
     super.dispose();
   }
 
@@ -231,14 +220,23 @@ class HomeState extends State<AppHomePage> {
     ));
   }
 
+  MaterialHeader header;
+  MaterialFooter footer;
+
   Widget buildRefreshController(
       BuildContext context, Widget Function() childFunc) {
     final courseCellHeight = dp_width(128);
+    if (header == null) {
+      header = MaterialHeader();
+    }
+    if (footer == null) {
+      footer = MaterialFooter(enableInfiniteLoad: false);
+    }
     return EasyRefresh.custom(
         firstRefresh: false,
         scrollController: _scrollController,
-        header: SpaceHeader(),
-        footer: MaterialFooter(enableInfiniteLoad: false),
+        header: header,
+        footer: footer,
         onLoad: () {
           return;
         },
@@ -1114,35 +1112,31 @@ class HomeState extends State<AppHomePage> {
 
   Widget buildPlayer() {
     if (widget.currentSeek > 0) {
-      widget.chewieController
+      chewieController
           ?.seekTo(Duration(milliseconds: widget.currentSeek.toInt()));
     }
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          if (widget
-                  .chewieController?.videoPlayerController?.value?.isPlaying ??
-              false) {
-            widget.chewieController?.pause();
-          } else {
-            widget.chewieController?.play();
-          }
-        });
-      },
-      child:
-//        VideoPlayer(widget.controller)
-          Chewie(
-        controller: widget.chewieController,
-      ),
-    );
+    if (mChewie == null) {
+      mChewie = Chewie(
+        controller: chewieController,
+      );
+    }
+    return mChewie;
   }
+
+  Chewie mChewie;
 
   void play() {
-    widget.chewieController?.play();
+    chewieController?.play();
+    controller?.play();
   }
 
-  void stop() {
-    widget.chewieController?.pause();
+  bool _isPlaying() {
+    return controller.value?.isPlaying ?? false;
+  }
+
+  void pause() {
+    chewieController?.pause();
+    controller?.pause();
   }
 
   Widget _buildItem(int index) {

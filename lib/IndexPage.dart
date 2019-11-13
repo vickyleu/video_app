@@ -4,14 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_app/AppHomePage.dart';
 
+import 'AppHomePage2.dart';
 import 'flutter_export.dart';
 
 // 底部导航类
 class IndexPage extends StatefulWidget {
   int _currentIndex = 0;
 
-  Map<int, StatefulWidget> pageList =
-      [AppHomePage(), EmptyPage(), EmptyPage(), EmptyPage()].asMap();
+  Map<int, StatefulWidget> pageList = [
+//    AppHomePage2(),
+    AppHomePage(),
+    EmptyPage(), EmptyPage(), EmptyPage()
+  ].asMap();
 
   bool firstDelayed = false;
 
