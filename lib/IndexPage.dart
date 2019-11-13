@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:video_app/AppHomePage.dart';
-
+///
 import 'AppHomePage2.dart';
 import 'flutter_export.dart';
 
@@ -12,9 +12,10 @@ class IndexPage extends StatefulWidget {
   int _currentIndex = 0;
 
   Map<int, StatefulWidget> pageList = [
-//    AppHomePage2(),
-    AppHomePage(),
-    EmptyPage(), EmptyPage(), EmptyPage()
+    AppHomePage2(),
+//    AppHomePage(),
+    EmptyPage(),
+    EmptyPage(), EmptyPage()
   ].asMap();
 
   bool firstDelayed = false;
